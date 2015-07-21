@@ -17,9 +17,13 @@
     self.frame = CGRectMake(0, 0, height, 0);
     [self sizeToFit];
 }
+
 -(CGRect)rectForText:(NSString*)text{
     self.lineBreakMode = NSLineBreakByWordWrapping;
     NSRange range = [[self text]rangeOfString:text];
+    if (range.location == NSNotFound) {
+        return CGRectZero;
+    }
     NSString* str = [[self text]substringToIndex:(range.location+ range.length)];
     NSString* str1 = [[self text]substringToIndex:range.location-1];
     NSMutableParagraphStyle *titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
@@ -51,10 +55,10 @@
     if (round(rect.size.height) == round(rectNoText.size.height)) {
         textRect.origin.x = rect.size.width - textRect.size.width;//at first line
         textRect.origin.y = round(rect.size.height) - textRect.size.height;
-        if (round(rect.size.height) >= self.bounds.size.height && round(rectNoText.size.height) >= self.bounds.size.height) {
+        if (round(rect.size.height) > ceil(self.font.lineHeight) && round(rectNoText.size.height) > ceil(self.font.lineHeight)) {
             //find character at begin of lastLine
             CGRect tempRect = CGRectZero;
-            int index = range.location;
+            NSInteger index = range.location;
             do {
                 --index;
                 NSString* firstLineString = [[self text]substringToIndex:index];
